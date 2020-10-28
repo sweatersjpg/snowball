@@ -37,17 +37,20 @@ function Game(level) {
     for (let a of this.actors) a.update();
     for (let a of this.actors) a.doCollision();
 
-    let xoff = snowball.pos.x - 200;
-    let yoff = snowball.pos.y - 120;
+    // let xoff = snowball.pos.x - 200;
+    // let yoff = snowball.pos.y - 120;
+    let room = this.actors[0].getRoom();
+    let xoff = room % lData.levels[this.level].width;
+    let yoff = floor(room / lData.levels[this.level].width);
 
     for (var i = 0; i < lData.levels[this.level].rooms.length; i++) {
       let width = lData.levels[this.level].width;
       let room = lData.levels[this.level].rooms[i];
-      setCamera(i%width * 400 - xoff, floor(i/width) * 240 - yoff);
+      setCamera(i%width * 400 - xoff*400, floor(i/width) * 240 - yoff*240);
       DrawMap(this.level, i);
     }
     // DrawMap(this.level, snowball.getRoom());
-    setCamera(-xoff, -yoff);
+    setCamera(-xoff*400, -yoff*240);
 
     for (let a of this.actors) a.draw();
 

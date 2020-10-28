@@ -2,13 +2,13 @@
 function Snowball(x, y, game) {
   Actor.call(this, x, y, 12, 22, game);
 
-  this.dir = true; // right
+  this.dir = true;
 
   this.bffr = {
     jump: 0
   }
 
-  this.inertia = 0.80;
+  this.inertia = 0.70;
   this.idleFrame = 0;
   this.runFrame = 0;
   this.state = "slide";
@@ -25,8 +25,9 @@ function Snowball(x, y, game) {
         frame = jump[0];
       }
       if((btn('left') != btn('right')) /*&& !(this.touching.left || this.touching.right)*/){ // RUN
-        this.state = 'run';
         let change = 0.4;
+        if(this.inertia >= 0.8) change = 0.6;
+        else this.state = 'run';
         if(change > 1) change = 1;
         this.runFrame += change;
         this.runFrame %= run.length;
@@ -74,16 +75,20 @@ function Snowball(x, y, game) {
     if(this.vel.y > 0.5) this.vel.y += GRAV;
 
     let acc = 2;
-    if(btn('left')) {
-      this.vel.x -= acc;
+    if(btn('left')) this.vel.x -= acc;
+    if(btn('right')) this.vel.x += acc;
+
+    if((this.touching.bottom && !btn('left') && !btn('right')) || (this.touching.bottom && abs(this.vel.x) < 6)) {
+      if(this.inertia > 0.70) this.inertia -= 0.01;
+      else this.inertia = 0.7;
     }
-    if(btn('right')) {
-      this.vel.x += acc;
+    if((btn('left') || btn('right')) && abs(this.vel.x) > 6) {
+      if(this.inertia < 0.80) this.inertia += 0.005;
     }
 
     if(this.touching.bottom) {
-      if(btn('left')) this.dir = true;
-      if(btn('right')) this.dir = false;
+      if(btn('left') && !btn('right')) this.dir = true;
+      if(btn('right') && !btn('left')) this.dir = false;
     }
 
     if(this.touching.bottom && this.bffr.jump) {
